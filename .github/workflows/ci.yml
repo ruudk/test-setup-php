@@ -7,7 +7,7 @@ jobs:
     env:
       DB_USERNAME: root
       DB_PASSWORD: yii
-      DB_CHARSET: utf-8
+      DB_CHARSET: utf8
     services:
       mysql:
         image: mysql:5.7
