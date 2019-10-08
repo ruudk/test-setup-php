@@ -8,7 +8,7 @@ jobs:
       DB_USERNAME: root
       DB_PASSWORD: yii
       TEST_DB_USERNAME: root
-      TEST_DB_PASSWORD: yii   
+      TEST_DB_PASSWORD: yii
       DB_CHARSET: utf8
     services:
       mysql:
@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        php-versions: [7.2, 7.3, 7.4]
+        php-versions: [7.2, 7.3]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -44,12 +44,16 @@ jobs:
         run: |
           php -r "file_exists('.env') || copy('.env.dist', '.env');"
           php console/yii app/setup
-          npm install
+          npm install --development
           npm run build
         env:
           DB_DSN: mysql:host=127.0.0.1;port=${{ job.services.mysql.ports['3306'] }};dbname=yii
+          TEST_DB_DSN: mysql:host=127.0.0.1;port=${{ job.services.mysql.ports['3306'] }};dbname=yii
       - name: Run Tests
-        run: php tests/bin/yii app/setup --interactive=0
+        run: |
+          vendor/bin/codecept build
+          php tests/bin/yii app/setup --interactive=0
+          vendor/bin/codecept run
         env:
           DB_DSN: mysql:host=127.0.0.1;port=${{ job.services.mysql.ports['3306'] }};dbname=yii
           TEST_DB_DSN: mysql:host=127.0.0.1;port=${{ job.services.mysql.ports['3306'] }};dbname=yii
