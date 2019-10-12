@@ -49,9 +49,7 @@ jobs:
       - name: Prepare the application
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       - name: Register Redis as service provider
-        run: |
-          sed -i 's/return $app;/$app->register(Illuminate\Redis\RedisServiceProvider::class);\nreturn $app;/g' bootstrap/app.php
-          cat bootstrap/app.php
+        run: sed -i '$i\$app->register(Illuminate\\Redis\\RedisServiceProvider::class);' bootstrap/app.php
       - name: Run Migration
         run: php artisan migrate -v
         env:
