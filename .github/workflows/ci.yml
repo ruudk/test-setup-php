@@ -1,7 +1,7 @@
 name: Unit Testing Lumen
 on: [push, pull_request]
 jobs:
-  lumen
+  lumen:
     name: Lumen (PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }})
     runs-on: ${{ matrix.operating-system }}
     strategy:
