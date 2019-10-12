@@ -1,30 +1,28 @@
-# GitHub Action for Lumen with PostgreSQL and Redis
-name: Testing Lumen with PostgreSQL
+# GitHub Action for Lumen with MySQL and Redis
+name: Testing Lumen with MySQL
 on: [push, pull_request]
 jobs:
-  laravel:
+  lumen:
     name: Lumen (PHP ${{ matrix.php-versions }})
     runs-on: ubuntu-latest
     env:
+      DB_DATABASE: lumen
+      DB_USERNAME: root
+      DB_PASSWORD: password
       BROADCAST_DRIVER: log
       CACHE_DRIVER: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
-      DB_CONNECTION: pgsql
-      DB_HOST: localhost
-      DB_PASSWORD: postgres
-      DB_USERNAME: postgres
-      DB_DATABASE: postgres
     services:
-      postgres:
-        image: postgres:10.8
+      mysql:
+        image: mysql:5.7
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: lumen
         ports:
-          - 5432/tcp
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       redis:
         image: redis
         ports:
@@ -34,7 +32,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        php-versions: ['7.2', '7.3', '7.4']
+        php-versions: ['7.2', '7.3']
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -55,8 +53,8 @@ jobs:
       - name: Run Migration
         run: php artisan migrate -v
         env:
-          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          DB_PORT: ${{ job.services.mysql.ports['3306'] }}
       - name: Test with phpunit
         run: vendor/bin/phpunit --coverage-text
         env:
-          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          DB_PORT: ${{ job.services.mysql.ports['3306'] }}
