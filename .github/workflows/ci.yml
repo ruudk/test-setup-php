@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DB_DATABASE: lumen
+      DB_USERNAME: root
       DB_PASSWORD: password
       BROADCAST_DRIVER: log
       CACHE_DRIVER: redis
@@ -47,6 +48,10 @@ jobs:
           composer require predis/predis illuminate/redis
       - name: Prepare the application
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Register Redis as service provider
+        run: |
+          sed -i 's/return $app;/$app->register(Illuminate\Redis\RedisServiceProvider::class);\nreturn $app;/g' bootstrap/app.php
+          cat bootstrap/app.php
       - name: Run Migration
         run: php artisan migrate -v
         env:
