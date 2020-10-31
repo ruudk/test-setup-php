@@ -9,7 +9,7 @@ env:
 jobs:
   phpunit-mssql:
     name: "PHPUnit with SQL Server"
-    runs-on: "ubuntu-18.04"
+    runs-on: "ubuntu-20.04"
     
     strategy:
       fail-fast: false
@@ -52,7 +52,7 @@ jobs:
           fetch-depth: 2
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@verbose"
+        uses: "shivammathur/setup-php@develop"
         with:
           php-version: "${{ matrix.php-version }}"
           coverage: "pcov"
